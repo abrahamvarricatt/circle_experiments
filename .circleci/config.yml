@@ -4,37 +4,50 @@
 #
 version: 2
 jobs:
-  build:
+  setup_dependencies:
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:2.7.14
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
-
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
       - run:
           name: install dependencies
           command: |
             virtualenv venv
             . venv/bin/activate
             pip install -r requirements.txt
-
       - save_cache:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - persist_to_workspace:
+        root: ~/repo
+        paths:
+          - venv
+  
+  run_hello:
+    docker:
+      - image: circleci/python:2.7.14
+    working_directory: ~/repo
+    steps:
+      - run:
+          name: basic hello
+          command: |
+            . venv/bin/activate
+            python hello.py
+
+
+workflows:
+  version: 2
+  my-first-workflow:
+    jobs:
+      - setup_dependencies
+      - run_hello:
+          requires:
+            - setup_dependencies
+
