@@ -35,6 +35,9 @@ jobs:
       - image: circleci/python:2.7.14
     working_directory: ~/repo
     steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: ~/repo
       - run:
           name: basic hello
           command: |
