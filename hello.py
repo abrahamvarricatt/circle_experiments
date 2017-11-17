@@ -2,7 +2,7 @@
 
 import os
 
-DUMMY = os.environment.get('DUMMY')
+DUMMY = os.environ.get('DUMMY')
 
 print('Hello World!')
 
